@@ -3,24 +3,35 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
 )
 
-func main(){
-	file, err := os.Open("problems.csv")
+func compileProblems(filename string) [][]string {
+	fmt.Println("Compiling quiz questions from", filename)
+	file, err := os.Open(filename)
+	// should return this 
 	if err != nil { fmt.Println("There was an issue opening your file", err) }
 	defer file.Close()
 
 	filereader := csv.NewReader(file)
-	inputreader := bufio.NewReader(os.Stdin)
-	var correctanswers, incorrectanswers int
-
 	records, err := filereader.ReadAll() // assumes entire file will fit in memory
 	if err != nil {
 		fmt.Println("oh noes:", err)
 	}
+
+	return records
+}
+
+func main(){
+	filenamePtr := flag.String("filename", "problems.csv", "point me to your problems")
+	flag.Parse()
+
+	records := compileProblems(*filenamePtr)
+	inputreader := bufio.NewReader(os.Stdin)
+	var correctanswers, incorrectanswers int
 
 	for _, record := range records {
 		fmt.Println(record[0],"?")
