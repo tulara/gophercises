@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
 // do i need to export this?
@@ -73,13 +74,29 @@ func parseProblems(records [][]string) []problem {
 }
 
 
-func main(){
+func main() {
 	filenamePtr := flag.String("filename", "problems.csv", "point me to your problems")
+	limitPtr := flag.Int("limit", 30, "time limit for the quiz in seconds")
 	flag.Parse()
 
+	quizLimit := time.Duration(*limitPtr)
+
 	records := compileProblemsFromFile(*filenamePtr)
-	
 	problems := parseProblems(records)
-	correctanswers, incorrectanswers := runQuiz(problems, os.Stdin)
-	fmt.Printf("Total correct: %d, Total incorrect: %d", correctanswers, incorrectanswers)
+
+	done := make(chan bool)
+
+	go func() {
+		correctanswers, incorrectanswers := runQuiz(problems, os.Stdin)
+		fmt.Printf("Total correct: %d, Total incorrect: %d", correctanswers, incorrectanswers)
+		done <- true
+	}()
+
+	select {
+	case result := <-done:
+		fmt.Println(result)
+	case <-time.After(quizLimit*time.Second):
+		fmt.Println("You've run out of time")
+	}
+
 }
