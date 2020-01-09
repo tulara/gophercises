@@ -5,14 +5,41 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"io"
 	"os"
-	"strings"
 )
 
+// do i need to export this?
 type problem struct {
 	question string
 	answer string
 } 
+
+// does this need to be exported if it is in the same package? seems like no?
+func runQuiz(problems []problem, handle io.Reader) (int, int){
+
+	scanner := bufio.NewScanner(handle)
+	var correctanswers, incorrectanswers int
+
+	for i, problem := range problems {
+		fmt.Printf("Question %d: %s:", i+1, problem.question)
+		
+		var useranswer string
+		if scanner.Scan() {
+			useranswer = scanner.Text()
+		}
+		if err := scanner.Err(); err != nil {
+			panic (err)
+		}
+
+		if(useranswer == problem.answer) {
+			correctanswers++
+		} else {
+			incorrectanswers++
+		}
+	}
+	return correctanswers, incorrectanswers
+}
 
 func compileProblemsFromFile(filename string) [][]string {
 	fmt.Println("Compiling quiz questions from", filename)
@@ -33,23 +60,6 @@ func compileProblemsFromFile(filename string) [][]string {
 	return records
 }
 
-func runQuiz(problems []problem, reader bufio.Reader) (int, int){
-	var correctanswers, incorrectanswers int
-
-	for i, problem := range problems {
-		fmt.Printf("Question %d: %s:", i+1, problem.question)
-		useranswer, err := reader.ReadString('\n')
-		if err != nil { panic(err) }
-
-		if(strings.TrimSpace(useranswer) == problem.answer){
-			correctanswers++
-		} else {
-			incorrectanswers++
-		}
-	}
-	return correctanswers, incorrectanswers
-}
-
 func parseProblems(records [][]string) []problem {
 	problems := make([]problem, len(records))
 	for i, record := range records {
@@ -68,9 +78,8 @@ func main(){
 	flag.Parse()
 
 	records := compileProblemsFromFile(*filenamePtr)
-	inputReader := bufio.NewReader(os.Stdin)
 	
 	problems := parseProblems(records)
-	correctanswers, incorrectanswers := runQuiz(problems, *inputReader)
+	correctanswers, incorrectanswers := runQuiz(problems, os.Stdin)
 	fmt.Printf("Total correct: %d, Total incorrect: %d", correctanswers, incorrectanswers)
 }
