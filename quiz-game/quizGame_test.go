@@ -5,13 +5,6 @@ import (
 	"testing"
 )
 
-func TestSum(t *testing.T) {
-	total := Sum(3, 7)
-	if total != 10 {
-		t.Errorf("Sum totaled to incorrect value, expected: %d but actual: %d", 10, total)
-	}
-}
-
 func TestRunQuiz(t *testing.T) {
 
 	problems := []problem{ 
