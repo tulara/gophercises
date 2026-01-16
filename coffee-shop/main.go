@@ -10,14 +10,21 @@ import (
 
 func main() {
 	store := store.NewMemoryStore()
-	handler := handler.NewHandler(store)
-
-	http.HandleFunc("/", handleCafe)
-	http.HandleFunc("/cafes", handler.HandleCreateCafe)
-	http.HandleFunc("/cafes/{id}", handler.HandleGetCafe)
+	mux := setupRoutes(store)
 
 	fmt.Println("Listening on :8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", mux)
+}
+
+// setupRoutes creates a new mux and registers all routes
+func setupRoutes(store store.Store) *http.ServeMux {
+	h := handler.NewHandler(store)
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", handleCafe)
+	mux.HandleFunc("/cafes", h.HandleCreateCafe)
+	mux.HandleFunc("/cafes/{id}", h.HandleGetCafe)
+	return mux
 }
 
 func handleCafe(w http.ResponseWriter, r *http.Request) {
