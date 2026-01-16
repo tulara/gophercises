@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/tulara/coffeeshop/handler"
+	"github.com/tulara/coffeeshop/store"
 )
 
 func main() {
+	store := store.NewMemoryStore()
+	handler := handler.NewHandler(store)
+
 	http.HandleFunc("/", handleCafe)
+	http.HandleFunc("/cafes", handler.HandleCreateCafe)
 
 	fmt.Println("Listening on :8080")
 	http.ListenAndServe(":8080", nil)
