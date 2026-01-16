@@ -14,6 +14,7 @@ func main() {
 
 	http.HandleFunc("/", handleCafe)
 	http.HandleFunc("/cafes", handler.HandleCreateCafe)
+	http.HandleFunc("/cafes/{id}", handler.HandleGetCafe)
 
 	fmt.Println("Listening on :8080")
 	http.ListenAndServe(":8080", nil)
