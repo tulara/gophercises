@@ -9,11 +9,6 @@ import (
 )
 
 func (h *Handler) HandleCreateCafe(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// use json decoder (rather than unmarshal) when json data is incoming from a stream
 	// and does not need to be fully loaded into memory at once.
 	var cafe domain.Cafe

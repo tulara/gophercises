@@ -6,15 +6,19 @@ import (
 )
 
 func (h *Handler) HandleGetCafes(w http.ResponseWriter, r *http.Request) {
+	cafes := h.store.GetCafes()
 
-}
-
-func (h *Handler) HandleGetCafe(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	cafesJson, err := json.Marshal(cafes)
+	if err != nil {
+		http.Error(w, "Unable to marshal response", http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(cafesJson)
+}
+
+func (h *Handler) HandleGetCafe(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	cafe := h.store.GetCafe(id)
 	if cafe == nil {

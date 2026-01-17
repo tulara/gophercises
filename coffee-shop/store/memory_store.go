@@ -32,3 +32,14 @@ func (s *MemoryStore) GetCafe(id string) *domain.Cafe {
 	defer s.mut.RUnlock()
 	return s.cafes[id]
 }
+
+func (s *MemoryStore) GetCafes() []*domain.Cafe {
+	s.mut.RLock()
+	defer s.mut.RUnlock()
+
+	cafes := []*domain.Cafe{}
+	for _, v := range s.cafes {
+		cafes = append(cafes, v)
+	}
+	return cafes
+}
