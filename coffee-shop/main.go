@@ -21,9 +21,9 @@ func setupRoutes(store store.Store) *http.ServeMux {
 	h := handler.NewHandler(store)
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handleCafe)
-	mux.HandleFunc("/cafes", h.HandleCreateCafe)
-	mux.HandleFunc("/cafes/{id}", h.HandleGetCafe)
+	mux.HandleFunc("GET /", handleCafe)
+	mux.HandleFunc("PUT /cafes", h.HandleCreateCafe)
+	mux.HandleFunc("GET /cafes/{id}", h.HandleGetCafe)
 	return mux
 }
 
