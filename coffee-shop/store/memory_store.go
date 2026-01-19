@@ -33,9 +33,12 @@ func (s *MemoryStore) GetCafe(id string) *domain.Cafe {
 	return s.cafes[id]
 }
 
-func (s *MemoryStore) GetCafes() []*domain.Cafe {
+func (s *MemoryStore) GetCafes(size int, index string) []*domain.Cafe {
 	s.mut.RLock()
 	defer s.mut.RUnlock()
+
+	// change indexing to timestamps
+	// doesn't make so much sense for cafes but so frequently used for other domains.
 
 	cafes := []*domain.Cafe{}
 	for _, v := range s.cafes {
