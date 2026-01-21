@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/tulara/coffeeshop/domain"
+	"github.com/tulara/coffeeshop/handler"
 	"github.com/tulara/coffeeshop/store"
 )
 
@@ -22,7 +24,7 @@ func TestAPIEndToEnd(t *testing.T) {
 		// Step 1: Create a cafe
 		cafe := domain.Cafe{
 			Name: "Stumptown Coffee",
-			ID:   "stumptown-1",
+			ID:   1,
 		}
 
 		reqBody, err := json.Marshal(cafe)
@@ -47,7 +49,7 @@ func TestAPIEndToEnd(t *testing.T) {
 		}
 
 		// Step 2: Retrieve the cafe
-		getReq, err := http.NewRequest(http.MethodGet, server.URL+"/cafes/stumptown-1", nil)
+		getReq, err := http.NewRequest(http.MethodGet, server.URL+"/cafes/1", nil)
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}
@@ -70,8 +72,8 @@ func TestAPIEndToEnd(t *testing.T) {
 		if retrievedCafe.Name != "Stumptown Coffee" {
 			t.Errorf("Expected retrieved cafe name 'Stumptown Coffee', got '%s'", retrievedCafe.Name)
 		}
-		if retrievedCafe.ID != "stumptown-1" {
-			t.Errorf("Expected retrieved cafe ID 'stumptown-1', got '%s'", retrievedCafe.ID)
+		if retrievedCafe.ID != 1 {
+			t.Errorf("Expected retrieved cafe ID 'stumptown-1', got '%d'", retrievedCafe.ID)
 		}
 	})
 
@@ -82,16 +84,16 @@ func TestAPIEndToEnd(t *testing.T) {
 		client := &http.Client{}
 
 		cafes := []domain.Cafe{
-			{Name: "Blue Bottle", ID: "blue-bottle-1"},
-			{Name: "Intelligentsia", ID: "intelligentsia-1"},
-			{Name: "Counter Culture", ID: "counter-culture-1"},
+			{Name: "Blue Bottle", ID: 1},
+			{Name: "Intelligentsia", ID: 2},
+			{Name: "Counter Culture", ID: 3},
 		}
 
 		// Create all cafes
 		for _, cafe := range cafes {
 			reqBody, err := json.Marshal(cafe)
 			if err != nil {
-				t.Fatalf("Failed to marshal cafe %s: %v", cafe.ID, err)
+				t.Fatalf("Failed to marshal cafe %d: %v", cafe.ID, err)
 			}
 
 			req, err := http.NewRequest(http.MethodPut, server.URL+"/cafes", bytes.NewBuffer(reqBody))
@@ -107,13 +109,13 @@ func TestAPIEndToEnd(t *testing.T) {
 			resp.Body.Close()
 
 			if resp.StatusCode != http.StatusCreated {
-				t.Errorf("Failed to create cafe %s: got status %d", cafe.ID, resp.StatusCode)
+				t.Errorf("Failed to create cafe %d: got status %d", cafe.ID, resp.StatusCode)
 			}
 		}
 
 		// Retrieve each cafe and verify
 		for _, expectedCafe := range cafes {
-			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes/%s", server.URL, expectedCafe.ID), nil)
+			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes/%s", server.URL, strconv.Itoa(expectedCafe.ID)), nil)
 			if err != nil {
 				t.Fatalf("Failed to create request: %v", err)
 			}
@@ -124,14 +126,14 @@ func TestAPIEndToEnd(t *testing.T) {
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				t.Errorf("Failed to retrieve cafe %s: got status %d", expectedCafe.ID, resp.StatusCode)
+				t.Errorf("Failed to retrieve cafe %d: got status %d", expectedCafe.ID, resp.StatusCode)
 				resp.Body.Close()
 				continue
 			}
 
 			var retrievedCafe domain.Cafe
 			if err := json.NewDecoder(resp.Body).Decode(&retrievedCafe); err != nil {
-				t.Errorf("Failed to unmarshal cafe %s: %v", expectedCafe.ID, err)
+				t.Errorf("Failed to unmarshal cafe %d: %v", expectedCafe.ID, err)
 				resp.Body.Close()
 				continue
 			}
@@ -141,8 +143,103 @@ func TestAPIEndToEnd(t *testing.T) {
 				t.Errorf("Expected cafe name '%s', got '%s'", expectedCafe.Name, retrievedCafe.Name)
 			}
 			if retrievedCafe.ID != expectedCafe.ID {
-				t.Errorf("Expected cafe ID '%s', got '%s'", expectedCafe.ID, retrievedCafe.ID)
+				t.Errorf("Expected cafe ID '%d', got '%d'", expectedCafe.ID, retrievedCafe.ID)
 			}
+		}
+	})
+
+	t.Run("create multiple cafes and paginate", func(t *testing.T) {
+		server := setupTestServer()
+		defer server.Close()
+
+		client := &http.Client{}
+
+		cafes := []domain.Cafe{
+			{Name: "Blue Bottle", ID: 1},
+			{Name: "Intelligentsia", ID: 2},
+			{Name: "Counter Culture", ID: 3},
+		}
+
+		// Create all cafes
+		for _, cafe := range cafes {
+			reqBody, err := json.Marshal(cafe)
+			if err != nil {
+				t.Fatalf("Failed to marshal cafe %d: %v", cafe.ID, err)
+			}
+
+			req, err := http.NewRequest(http.MethodPut, server.URL+"/cafes", bytes.NewBuffer(reqBody))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := client.Do(req)
+			if err != nil {
+				t.Fatalf("Failed to make request: %v", err)
+			}
+
+			if resp.StatusCode != http.StatusCreated {
+				t.Errorf("Failed to create cafe %d: got status %d", cafe.ID, resp.StatusCode)
+			}
+			resp.Body.Close()
+		}
+
+		// list 2 from beginning
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes?page_size=2", server.URL), nil)
+		if err != nil {
+			t.Fatalf("Failed to create request: %v", err)
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make request: %v", err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Failed to retrieve cafes, got status %d", resp.StatusCode)
+			resp.Body.Close()
+		}
+
+		var retrievedCafes *handler.GetCafesDTO
+		if err := json.NewDecoder(resp.Body).Decode(&retrievedCafes); err != nil {
+			t.Errorf("Failed to unmarshal cafes: %v", err)
+			resp.Body.Close()
+		}
+		resp.Body.Close()
+
+		if len(retrievedCafes.Data) != 2 {
+			t.Fatalf("Fetched %d instead of 2 cafes", len(retrievedCafes.Data))
+		}
+
+		// use cursor from previous response to request next page, and list one remaining cafe
+		// list 2 from beginning
+		id := retrievedCafes.Data[1].ID
+		req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes?page_size=2&cursor=%d", server.URL, id), nil)
+		if err != nil {
+			t.Fatalf("Failed to create request: %v", err)
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make request: %v", err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Failed to retrieve cafes, got status %d", resp.StatusCode)
+			resp.Body.Close()
+		}
+
+		if err := json.NewDecoder(resp.Body).Decode(&retrievedCafes); err != nil {
+			t.Errorf("Failed to unmarshal cafes: %v", err)
+			resp.Body.Close()
+		}
+		resp.Body.Close()
+
+		if len(retrievedCafes.Data) != 1 {
+			t.Error("Incorrect number of cafes fetched")
+			resp.Body.Close()
 		}
 	})
 
@@ -151,7 +248,7 @@ func TestAPIEndToEnd(t *testing.T) {
 		defer server.Close()
 
 		client := &http.Client{}
-		req, err := http.NewRequest(http.MethodGet, server.URL+"/cafes/non-existent", nil)
+		req, err := http.NewRequest(http.MethodGet, server.URL+"/cafes/999", nil)
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}

@@ -19,7 +19,7 @@ func TestHandleCreateCafe(t *testing.T) {
 
 		cafe := domain.Cafe{
 			Name: "Idempotent Cafe",
-			ID:   "idempotent-1",
+			ID:   1,
 		}
 
 		reqBody, err := json.Marshal(cafe)
@@ -50,14 +50,14 @@ func TestHandleCreateCafe(t *testing.T) {
 		}
 
 		// Verify cafe still exists and is unchanged (idempotent - same data = same result)
-		retrievedCafe := s.GetCafe("idempotent-1")
+		retrievedCafe := s.GetCafe(1)
 		if retrievedCafe == nil {
 			t.Fatal("Expected cafe to exist, but it was nil")
 		}
 		if retrievedCafe.Name != "Idempotent Cafe" {
 			t.Errorf("Expected cafe name 'Idempotent Cafe', got '%s'", retrievedCafe.Name)
 		}
-		if retrievedCafe.ID != "idempotent-1" {
+		if retrievedCafe.ID != 1 {
 			t.Errorf("Expected cafe ID 'idempotent-1', got '%s'", retrievedCafe.ID)
 		}
 	})
@@ -69,7 +69,7 @@ func TestHandleCreateCafe(t *testing.T) {
 		// Create initial cafe
 		originalCafe := domain.Cafe{
 			Name: "Original Name",
-			ID:   "update-test-1",
+			ID:   1,
 		}
 
 		reqBody1, err := json.Marshal(originalCafe)
@@ -90,7 +90,7 @@ func TestHandleCreateCafe(t *testing.T) {
 		// Update with different data
 		updatedCafe := domain.Cafe{
 			Name: "Updated Name",
-			ID:   "update-test-1", // Same ID
+			ID:   1, // Same ID
 		}
 
 		reqBody2, err := json.Marshal(updatedCafe)
@@ -109,7 +109,7 @@ func TestHandleCreateCafe(t *testing.T) {
 		}
 
 		// Verify cafe was updated
-		retrievedCafe := s.GetCafe("update-test-1")
+		retrievedCafe := s.GetCafe(1)
 		if retrievedCafe == nil {
 			t.Fatal("Expected cafe to exist, but it was nil")
 		}
@@ -124,7 +124,7 @@ func TestHandleCreateCafe(t *testing.T) {
 
 		cafe := domain.Cafe{
 			Name: "Cafe Without ID",
-			ID:   "", // Missing ID
+			// Missing ID
 		}
 
 		reqBody, err := json.Marshal(cafe)

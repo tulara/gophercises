@@ -11,3 +11,7 @@ Build a rate-limited REST API for tracking and discovering coffee shops with JWT
 - `PUT /cafes/{id}` - Create or update cafe (only owner or admin)
 - `DELETE /cafes/{id}` - Delete cafe (only owner or admin)
 - `POST /cafes/{id}/visit` - Record a visit (increments visit_count, updates last_visited)
+
+## To Do
+
+[ ] Make sure Memory store has cafes sorted by ID.

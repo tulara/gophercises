@@ -19,7 +19,7 @@ func (h *Handler) HandleCreateCafe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if cafe.ID == "" {
+	if cafe.ID == 0 {
 		http.Error(w, "Cafe ID is required", http.StatusBadRequest)
 		return
 	}
