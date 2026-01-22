@@ -32,17 +32,7 @@ func TestAPIEndToEnd(t *testing.T) {
 			t.Fatalf("Failed to marshal cafe: %v", err)
 		}
 
-		createReq, err := http.NewRequest(http.MethodPut, server.URL+"/cafes", bytes.NewBuffer(reqBody))
-		if err != nil {
-			t.Fatalf("Failed to create request: %v", err)
-		}
-		createReq.Header.Set("Content-Type", "application/json")
-
-		createResp, err := client.Do(createReq)
-		if err != nil {
-			t.Fatalf("Failed to make request: %v", err)
-		}
-		defer createResp.Body.Close()
+		createResp := DoPUTRequest(t, client, http.MethodPut, server.URL+"/cafes", reqBody)
 
 		if createResp.StatusCode != http.StatusCreated {
 			t.Errorf("Expected status %d, got %d", http.StatusCreated, createResp.StatusCode)
@@ -96,17 +86,7 @@ func TestAPIEndToEnd(t *testing.T) {
 				t.Fatalf("Failed to marshal cafe %d: %v", cafe.ID, err)
 			}
 
-			req, err := http.NewRequest(http.MethodPut, server.URL+"/cafes", bytes.NewBuffer(reqBody))
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.Header.Set("Content-Type", "application/json")
-
-			resp, err := client.Do(req)
-			if err != nil {
-				t.Fatalf("Failed to make request: %v", err)
-			}
-			resp.Body.Close()
+			resp := DoPUTRequest(t, client, http.MethodPut, server.URL+"/cafes", reqBody)
 
 			if resp.StatusCode != http.StatusCreated {
 				t.Errorf("Failed to create cafe %d: got status %d", cafe.ID, resp.StatusCode)
@@ -167,16 +147,7 @@ func TestAPIEndToEnd(t *testing.T) {
 				t.Fatalf("Failed to marshal cafe %d: %v", cafe.ID, err)
 			}
 
-			req, err := http.NewRequest(http.MethodPut, server.URL+"/cafes", bytes.NewBuffer(reqBody))
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.Header.Set("Content-Type", "application/json")
-
-			resp, err := client.Do(req)
-			if err != nil {
-				t.Fatalf("Failed to make request: %v", err)
-			}
+			resp := DoPUTRequest(t, client, http.MethodPut, server.URL+"/cafes", reqBody)
 
 			if resp.StatusCode != http.StatusCreated {
 				t.Errorf("Failed to create cafe %d: got status %d", cafe.ID, resp.StatusCode)
@@ -263,6 +234,23 @@ func TestAPIEndToEnd(t *testing.T) {
 			t.Errorf("Expected status %d, got %d", http.StatusNotFound, resp.StatusCode)
 		}
 	})
+}
+
+// NOTE closes body before deserialisation
+func DoPUTRequest(t *testing.T, client *http.Client, method string, path string, reqBody []byte) *http.Response {
+	req, err := http.NewRequest(method, path, bytes.NewBuffer(reqBody))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to make request: %v", err)
+	}
+
+	resp.Body.Close()
+	return resp
 }
 
 // setupTestServer creates a test HTTP server with the same routes as main()
