@@ -28,19 +28,17 @@ func TestHandleCreateCafe(t *testing.T) {
 		}
 
 		// First PUT - should return 201 Created
-		req1 := httptest.NewRequest(http.MethodPut, "/cafes", bytes.NewBuffer(reqBody))
-		req1.Header.Set("Content-Type", "application/json")
+		cafeReq := newJsonRequest(http.MethodPut, "/cafes", reqBody)
 		w1 := httptest.NewRecorder()
 
-		h.HandleCreateCafe(w1, req1)
+		h.HandleCreateCafe(w1, cafeReq)
 
 		if w1.Code != http.StatusCreated {
 			t.Errorf("First PUT: Expected status %d, got %d", http.StatusCreated, w1.Code)
 		}
 
 		// Second PUT with same data - should return 200 OK (overwrites, but idempotent)
-		req2 := httptest.NewRequest(http.MethodPut, "/cafes", bytes.NewBuffer(reqBody))
-		req2.Header.Set("Content-Type", "application/json")
+		req2 := newJsonRequest(http.MethodPut, "/cafes", reqBody)
 		w2 := httptest.NewRecorder()
 
 		h.HandleCreateCafe(w2, req2)
@@ -58,7 +56,7 @@ func TestHandleCreateCafe(t *testing.T) {
 			t.Errorf("Expected cafe name 'Idempotent Cafe', got '%s'", retrievedCafe.Name)
 		}
 		if retrievedCafe.ID != 1 {
-			t.Errorf("Expected cafe ID 'idempotent-1', got '%s'", retrievedCafe.ID)
+			t.Errorf("Expected cafe ID 'idempotent-1', got '%d'", retrievedCafe.ID)
 		}
 	})
 
@@ -77,8 +75,7 @@ func TestHandleCreateCafe(t *testing.T) {
 			t.Fatalf("Failed to marshal cafe: %v", err)
 		}
 
-		req1 := httptest.NewRequest(http.MethodPut, "/cafes", bytes.NewBuffer(reqBody1))
-		req1.Header.Set("Content-Type", "application/json")
+		req1 := newJsonRequest(http.MethodPut, "/cafes", reqBody1)
 		w1 := httptest.NewRecorder()
 
 		h.HandleCreateCafe(w1, req1)
@@ -98,8 +95,7 @@ func TestHandleCreateCafe(t *testing.T) {
 			t.Fatalf("Failed to marshal cafe: %v", err)
 		}
 
-		req2 := httptest.NewRequest(http.MethodPut, "/cafes", bytes.NewBuffer(reqBody2))
-		req2.Header.Set("Content-Type", "application/json")
+		req2 := newJsonRequest(http.MethodPut, "/cafes", reqBody2)
 		w2 := httptest.NewRecorder()
 
 		h.HandleCreateCafe(w2, req2)
@@ -132,8 +128,7 @@ func TestHandleCreateCafe(t *testing.T) {
 			t.Fatalf("Failed to marshal cafe: %v", err)
 		}
 
-		req := httptest.NewRequest(http.MethodPut, "/cafes", bytes.NewBuffer(reqBody))
-		req.Header.Set("Content-Type", "application/json")
+		req := newJsonRequest(http.MethodPut, "/cafes", reqBody)
 		w := httptest.NewRecorder()
 
 		h.HandleCreateCafe(w, req)
@@ -147,4 +142,10 @@ func TestHandleCreateCafe(t *testing.T) {
 			t.Errorf("Expected error message about missing ID, got: %s", body)
 		}
 	})
+}
+
+func newJsonRequest(method string, path string, reqBody []byte) *http.Request {
+	req := httptest.NewRequest(method, path, bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-Type", "application/json")
+	return req
 }
