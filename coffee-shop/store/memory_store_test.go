@@ -18,7 +18,7 @@ func TestDefaultPageSizeAndCursor(t *testing.T) {
 		store.CreateCafe(&c)
 	}
 
-	retrievedCafes := store.GetCafes(5, 0)
+	retrievedCafes := store.GetCafes(5, 1)
 	if len(retrievedCafes) != 3 {
 		t.Errorf("Expected 3 cafes but there were %d", len(retrievedCafes))
 	}
@@ -36,7 +36,7 @@ func TestSmallerPageSizeAndCursor(t *testing.T) {
 		store.CreateCafe(&c)
 	}
 
-	retrievedCafes := store.GetCafes(2, 0)
+	retrievedCafes := store.GetCafes(2, 1)
 	if len(retrievedCafes) != 2 {
 		t.Errorf("Expected 2 cafes but there were %d", len(retrievedCafes))
 	}

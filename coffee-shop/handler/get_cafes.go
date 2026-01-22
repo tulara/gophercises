@@ -14,7 +14,7 @@ type GetCafesDTO struct {
 }
 
 type Pagination struct {
-	NextCursor string `json:"next_cursor"`
+	NextCursor string `json:"next_cursor,omitempty"`
 }
 
 // Page size defaults to 5.

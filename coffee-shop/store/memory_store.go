@@ -39,10 +39,22 @@ func (s *MemoryStore) GetCafes(size int, startFrom int) []*domain.Cafe {
 	defer s.mut.RUnlock()
 
 	cafes := []*domain.Cafe{}
-	for i := startFrom; i < startFrom+size; i++ {
-		if i < len(s.cafes) {
-			cafes = append(cafes, s.cafes[i])
-		}
+
+	// 5, 1 | 3
+	// 2, 1 | 3
+	// 1, 3 | 4
+
+	// 2, 3 | 6
+	// 3, 4 | 5
+	// 2, 3 | 3
+
+	end := startFrom + size
+	if startFrom+size > len(s.cafes) {
+		end = len(s.cafes) + 1
+	}
+
+	for i := startFrom; i < end; i++ {
+		cafes = append(cafes, s.cafes[i])
 	}
 	return cafes
 }

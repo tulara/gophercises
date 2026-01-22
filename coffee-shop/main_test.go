@@ -185,8 +185,8 @@ func TestAPIEndToEnd(t *testing.T) {
 
 		// use cursor from previous response to request next page, and list one remaining cafe
 		// list 2 from beginning
-		id := retrievedCafes.Data[1].ID
-		req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes?page_size=2&cursor=%d", server.URL, id), nil)
+		id := retrievedCafes.Pagination.NextCursor
+		req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/cafes?page_size=2&cursor=%s", server.URL, id), nil)
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}
