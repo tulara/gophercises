@@ -10,4 +10,6 @@ type Store interface {
 	// Returns size number of cafes starting from the cursor specified,
 	// plus an extra cafe if there are more available.
 	GetCafes(size int, cursor int) []*domain.Cafe
+
+	CreateUser(username string, passwword string)
 }

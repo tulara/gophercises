@@ -9,8 +9,6 @@ Build a rate-limited REST API for tracking and discovering coffee shops with JWT
 - `GET /cafes` - List cafes with pagination
 - `GET /cafes/{id}` - Get single cafe
 - `PUT /cafes/{id}` - Create or update cafe (only owner or admin)
-- `DELETE /cafes/{id}` - Delete cafe (only owner or admin)
-- `POST /cafes/{id}/visit` - Record a visit (increments visit_count, updates last_visited)
 
 ids are treated as idemponent; PUT updates with new details to the same id will overwrite pre-existing records. 
 
@@ -24,6 +22,9 @@ go run .
 go clean -testcache
 ```
 
-### BUGS
+### To do
 
-[ ] not returning full set of cafes or default page size
+[ ] implement graceful shutdown e.g. https://dev.to/mokiat/proper-http-shutdown-in-go-3fji
+-> remind myself how channels work.
+
+[ ] logger
