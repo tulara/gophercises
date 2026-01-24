@@ -6,7 +6,9 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-var salt = []byte("flooplewaffle")
+// extracted to .env irl
+// openssl rand -base64 20
+var salt = []byte("Fk+1lifqB4erZDNe/A3TNEOB+HSuaH9/NnTdHn9lXmyWns")
 var costFactor = 16384
 var blockSize = 8
 var parallelization = 1

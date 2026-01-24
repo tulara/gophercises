@@ -9,6 +9,10 @@ import (
 	"github.com/tulara/coffeeshop/domain"
 )
 
+type RegisterUserResponse struct {
+	Token string `json:"token"`
+}
+
 func (h *Handler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	var user domain.User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -30,5 +34,18 @@ func (h *Handler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	h.store.CreateUser(user.Username, hashedPassword)
 
+	token, err := auth.CreateToken(user.Username)
+	if err != nil {
+		fmt.Printf("Failed to create JWT: %v", err)
+		http.Error(w, "Failed to create token", http.StatusInternalServerError)
+		return
+	}
+
+	response := RegisterUserResponse{
+		Token: token,
+	}
+
 	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
