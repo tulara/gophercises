@@ -11,5 +11,6 @@ type Store interface {
 	// plus an extra cafe if there are more available.
 	GetCafes(size int, cursor int) []*domain.Cafe
 
-	CreateUser(username string, passwword string)
+	CreateUser(username string, password string)
+	GetUser(username string) *domain.User
 }

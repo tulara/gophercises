@@ -59,3 +59,18 @@ func (s *MemoryStore) CreateUser(username string, password string) {
 
 	s.users[username] = password
 }
+
+func (s *MemoryStore) GetUser(username string) *domain.User {
+	s.userMut.RLock()
+	defer s.userMut.RUnlock()
+
+	password, ok := s.users[username]
+	if !ok {
+		return nil
+	}
+
+	return &domain.User{
+		Username: username,
+		Password: password,
+	}
+}

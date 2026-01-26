@@ -26,7 +26,7 @@ func setupRoutes(store store.Store) *http.ServeMux {
 	mux.HandleFunc("GET /cafes", h.HandleGetCafes)
 	mux.HandleFunc("GET /cafes/{id}", h.HandleGetCafe)
 
-	mux.HandleFunc("POST /auth/register", h.HandleRegisterUser)
+	mux.HandleFunc("POST /register", h.HandleRegisterUser)
 	mux.HandleFunc("POST /login", h.HandleLogin)
 	return mux
 }

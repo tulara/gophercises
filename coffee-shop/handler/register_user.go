@@ -32,6 +32,14 @@ func (h *Handler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Failed to hash password: %v", err)
 		http.Error(w, "Failed Auth", http.StatusInternalServerError)
 	}
+
+	savedUser := h.store.GetUser(user.Username)
+	if savedUser != nil {
+		// username already exists.
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
 	h.store.CreateUser(user.Username, hashedPassword)
 
 	token, err := auth.CreateToken(user.Username)

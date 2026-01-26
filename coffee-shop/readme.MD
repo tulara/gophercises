@@ -2,8 +2,8 @@
 Build a rate-limited REST API for tracking and discovering coffee shops with JWT authentication, middleware, and graceful shutdown.
 
 ### Authentication
-- `POST /auth/register` - Register new user (username, password)
-- `POST /auth/login` - Login and receive JWT token
+- `POST /register` - Register new user (username, password)
+- `POST /login` - Login and receive JWT token
 
 ### Cafes (All require authentication)
 - `GET /cafes` - List cafes with pagination
@@ -28,3 +28,6 @@ go clean -testcache
 -> remind myself how channels work.
 
 [ ] logger
+
+### Bugs
+Why is register user redirect going to index?
