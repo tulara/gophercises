@@ -24,8 +24,7 @@ go clean -testcache
 
 ### To do
 
-[ ] implement graceful shutdown e.g. https://dev.to/mokiat/proper-http-shutdown-in-go-3fji
--> remind myself how channels work.
+[...] graceful shutdown; `kill -TERM [PID]` not triggering graceful shutdown??
 
 [ ] logger
 

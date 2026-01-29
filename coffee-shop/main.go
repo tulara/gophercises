@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/tulara/coffeeshop/handler"
 	"github.com/tulara/coffeeshop/middleware"
@@ -20,40 +24,29 @@ func main() {
 		Handler: mux,
 	}
 
-	// CLAUDE -
+	//difference between channel and context?
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	// // Channel to listen for OS signals
-	// sigChan := make(chan os.Signal, 1)
-	// // Notify sigChan when SIGINT (Ctrl+C) or SIGTERM is received
-	// signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		// what happens if we don't filter out http.ErrServerClosed
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatalf("Server failed to start: %v", err)
+		}
+	}()
+	fmt.Println("Server started on :8080")
+	fmt.Println("Press Ctrl+C or send SIGTERM to shut down")
 
-	// // Run server in a goroutine so it doesn't block
-	// go func() {
-	// 	fmt.Println("Server listening on :8080")
-	// 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-	// 		log.Fatalf("Server failed to start: %v", err)
-	// 	}
-	// }()
+	<-ctx.Done()
+	fmt.Println("Shutting down server gracefully...")
 
-	// // Block here until signal is received
-	// sig := <-sigChan
-	// fmt.Printf("\nReceived signal: %v. Shutting down gracefully...\n", sig)
+	shutdownCtx, timeout := context.WithTimeout(context.Background(), 30*time.Second)
+	defer timeout()
 
-	// // Create context with timeout for shutdown
-	// ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	// defer cancel()
-
-	// // Attempt graceful shutdown
-	// if err := server.Shutdown(ctx); err != nil {
-	// 	log.Fatalf("Server forced to shutdown: %v", err)
-	// }
-
-	// fmt.Println("Server stopped gracefully")
-
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		log.Fatalf("Server failed to start: %v", err)
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("Error shutting down: %v", err)
 	}
-	fmt.Println("Listen on :8080")
+	fmt.Println("Server stopped gracefully")
 }
 
 // setupRoutes creates a new mux and registers all routes
