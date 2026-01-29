@@ -29,5 +29,11 @@ go clean -testcache
 
 [ ] logger
 
+[ ] stub `time` in jwt so that expiry on tokens can be tested properly (via unit tests or config so that don't need to wait 24 hours in a test environment.)
+
 ### Bugs
-Why is register user redirect going to index?
+- Sort out ID generation and assumptions made in memory store. 
+
+- Why is register user redirect going to index?
+
+- If the server is restarted and a previous unexpired JWT token is used, the requests is authorised despite the user no longer existing. Probably would need to do something like purge/expire all tokens on restart.

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,6 +32,12 @@ func CreateToken(username string) (string, error) {
 // VerifyJWTToken returns username where the token is valid or an error otherwise.
 func VerifyJWTToken(tokenString string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		// avoid ALgorithm Confusion attacks.
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
 		return jwt_secret, nil
 	})
 

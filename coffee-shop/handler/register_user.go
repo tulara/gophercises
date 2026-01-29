@@ -31,12 +31,18 @@ func (h *Handler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
 		// Worth validating assumption that this won't send passwords to logs... or obfusicating logs
 		fmt.Printf("Failed to hash password: %v", err)
 		http.Error(w, "Failed Auth", http.StatusInternalServerError)
+		return
 	}
 
 	savedUser := h.store.GetUser(user.Username)
 	if savedUser != nil {
 		// username already exists.
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		// Return success to avoid username enumeration vulnerability,
+		// but don't create another account.
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "If this username is available, we will send you a confirmation email.",
+		})
 		return
 	}
 
@@ -53,7 +59,7 @@ func (h *Handler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
 		Token: token,
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }

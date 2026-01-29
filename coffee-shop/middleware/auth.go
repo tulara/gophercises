@@ -9,6 +9,8 @@ import (
 	"github.com/tulara/coffeeshop/auth"
 )
 
+const UsernameKey string = "username"
+
 func WithAuth(next func(w http.ResponseWriter, r *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
@@ -33,7 +35,7 @@ func WithAuth(next func(w http.ResponseWriter, r *http.Request)) func(http.Respo
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "username", username)
+		ctx := context.WithValue(r.Context(), UsernameKey, username)
 
 		next(w, r.WithContext(ctx))
 	}
