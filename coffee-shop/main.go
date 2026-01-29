@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/tulara/coffeeshop/handler"
+	"github.com/tulara/coffeeshop/middleware"
 	"github.com/tulara/coffeeshop/store"
 )
 
@@ -22,7 +23,7 @@ func setupRoutes(store store.Store) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /", handleCafe)
-	mux.HandleFunc("PUT /cafes", h.HandleCreateCafe)
+	mux.HandleFunc("PUT /cafes", middleware.WithAuth(h.HandleCreateCafe))
 	mux.HandleFunc("GET /cafes", h.HandleGetCafes)
 	mux.HandleFunc("GET /cafes/{id}", h.HandleGetCafe)
 

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -25,4 +26,32 @@ func CreateToken(username string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+// VerifyJWTToken returns username where the token is valid or an error otherwise.
+func VerifyJWTToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return jwt_secret, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if !token.Valid {
+		return "", errors.New("invalid token")
+	}
+
+	var username string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		if u, ok := claims["username"].(string); ok {
+			username = u
+		}
+	}
+
+	if username == "" {
+		return "", errors.New("invalid token claims")
+	}
+
+	return username, nil
 }
