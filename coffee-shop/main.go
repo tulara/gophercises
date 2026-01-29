@@ -29,8 +29,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		// what happens if we don't filter out http.ErrServerClosed
-		if err := server.ListenAndServe(); err != nil {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
 	}()

@@ -22,9 +22,9 @@ go run .
 go clean -testcache
 ```
 
-### To do
+`lsof -i :8080` shows processes running on port :8080
 
-[...] graceful shutdown; `kill -TERM [PID]` not triggering graceful shutdown??
+### To do
 
 [ ] logger
 
