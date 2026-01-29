@@ -24,10 +24,17 @@ func NewMemoryStore() Store {
 	}
 }
 
-func (s *MemoryStore) CreateCafe(cafe *domain.Cafe) {
+func (s *MemoryStore) UpsertCafe(cafe *domain.Cafe) bool {
 	s.cafeMut.Lock() //exclusive (write) lock.
 	defer s.cafeMut.Unlock()
+
+	if s.cafes[cafe.ID] == nil {
+		s.cafes[cafe.ID] = cafe
+		return true
+	}
+
 	s.cafes[cafe.ID] = cafe
+	return false
 }
 
 func (s *MemoryStore) GetCafe(id int) *domain.Cafe {

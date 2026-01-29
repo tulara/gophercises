@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/tulara/coffeeshop/handler"
@@ -13,8 +14,10 @@ func main() {
 	store := store.NewMemoryStore()
 	mux := setupRoutes(store)
 
-	fmt.Println("Listening on :8080")
-	http.ListenAndServe(":8080", mux)
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Fatalf("Server failed to start: %v", err)
+	}
+	fmt.Println("Listen on :8080")
 }
 
 // setupRoutes creates a new mux and registers all routes

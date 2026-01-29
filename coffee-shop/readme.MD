@@ -23,6 +23,7 @@ go clean -testcache
 ```
 
 ### To do
+[] Tests are failing because you haven't mocked the auth.
 
 [ ] implement graceful shutdown e.g. https://dev.to/mokiat/proper-http-shutdown-in-go-3fji
 -> remind myself how channels work.
@@ -33,7 +34,5 @@ go clean -testcache
 
 ### Bugs
 - Sort out ID generation and assumptions made in memory store. 
-
-- Why is register user redirect going to index?
 
 - If the server is restarted and a previous unexpired JWT token is used, the requests is authorised despite the user no longer existing. Probably would need to do something like purge/expire all tokens on restart.

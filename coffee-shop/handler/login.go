@@ -25,10 +25,13 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// can username and password even be empty?
+	if req.Username == "" || req.Password == "" {
+		http.Error(w, "Invalid request body, username and password are required.", http.StatusBadRequest)
+		return
+	}
+
 	user := h.store.GetUser(req.Username)
 	if user == nil {
-		fmt.Printf("Invalid Username: %v", err)
 		// Shouldn't tell user whether username exists or not.
 		// Ideally capture email and if they don't get an email they can go through
 		// a reset flow.

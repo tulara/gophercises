@@ -15,7 +15,7 @@ func TestDefaultPageSizeAndCursor(t *testing.T) {
 
 	store := NewMemoryStore()
 	for _, c := range cafes {
-		store.CreateCafe(&c)
+		store.UpsertCafe(&c)
 	}
 
 	retrievedCafes := store.GetCafes(5, 1)
@@ -33,7 +33,7 @@ func TestSmallerPageSizeAndCursor(t *testing.T) {
 
 	store := NewMemoryStore()
 	for _, c := range cafes {
-		store.CreateCafe(&c)
+		store.UpsertCafe(&c)
 	}
 
 	retrievedCafes := store.GetCafes(2, 1)

@@ -38,7 +38,7 @@ func (h *Handler) HandleGetCafes(w http.ResponseWriter, r *http.Request) {
 	if cursor != "" {
 		startFrom, err = strconv.Atoi(cursor)
 		if err != nil {
-			http.Error(w, "Unable to parse page size as integer", http.StatusBadRequest)
+			http.Error(w, "Unable to parse cursor as integer", http.StatusBadRequest)
 			return
 		}
 	}
