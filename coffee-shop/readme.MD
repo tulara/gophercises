@@ -23,7 +23,6 @@ go clean -testcache
 ```
 
 ### To do
-[] Tests are failing because you haven't mocked the auth.
 
 [ ] implement graceful shutdown e.g. https://dev.to/mokiat/proper-http-shutdown-in-go-3fji
 -> remind myself how channels work.
@@ -32,7 +31,14 @@ go clean -testcache
 
 [ ] stub `time` in jwt so that expiry on tokens can be tested properly (via unit tests or config so that don't need to wait 24 hours in a test environment.)
 
-### Bugs
+[] Tests are failing because you haven't mocked the auth. Because this is a learning project to get back up to speed I have deprioritised tests but there is an exercise in going back through and properly testing. And particularly reminding self of old ways.
+
+[ ] rate limiting
+
+### Bugs and tidys
 - Sort out ID generation and assumptions made in memory store. 
 
 - If the server is restarted and a previous unexpired JWT token is used, the requests is authorised despite the user no longer existing. Probably would need to do something like purge/expire all tokens on restart.
+
+- inconsistent json encoding (NewEncoder vs Marshal) and inconsistent error responses.
+- input validation (content-type header validation, request body size limits, pagination parameter validation)
