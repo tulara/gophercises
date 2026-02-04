@@ -1,5 +1,5 @@
 ## Exercise
-Build a rate-limited REST API for tracking and discovering coffee shops with JWT authentication, middleware, and graceful shutdown.
+Build a REST API for tracking and discovering coffee shops with JWT authentication, middleware, and graceful shutdown.
 
 ### Authentication
 - `POST /register` - Register new user (username, password)
@@ -26,11 +26,11 @@ go clean -testcache
 
 ### To do
 
-[ ] logger
-
 [ ] stub `time` in jwt so that expiry on tokens can be tested properly (via unit tests or config so that don't need to wait 24 hours in a test environment.)
 
 [] Tests are failing because you haven't mocked the auth. Because this is a learning project to get back up to speed I have deprioritised tests but there is an exercise in going back through and properly testing. And particularly reminding self of old ways.
+
+[ ] logger
 
 [ ] rate limiting
 
