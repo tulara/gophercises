@@ -8,8 +8,8 @@ type channelQueue struct {
 	orderChan chan Order
 }
 
-func Init() Queue {
-	q := make(chan Order, 1)
+func NewChannelQueue() Queue {
+	q := make(chan Order, 2)
 	return &channelQueue{
 		orderChan: q,
 	}
@@ -20,6 +20,7 @@ func (q *channelQueue) SendOrder(order Order) bool {
 	case q.orderChan <- order:
 		return true
 	default:
+		// log buffer overflow?
 		return false
 	}
 }

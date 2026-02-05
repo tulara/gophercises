@@ -6,9 +6,8 @@ import (
 )
 
 func TestSendAndRecieve(t *testing.T) {
-	q := Init()
+	q := NewChannelQueue()
 	order := Order{
-		ID: "1",
 		Meals: map[int]int{
 			1: 1,
 		},
@@ -21,7 +20,7 @@ func TestSendAndRecieve(t *testing.T) {
 		t.Fatalf("Error where none expected: %v", err)
 	}
 
-	if recievedOrder.ID != order.ID {
+	if recievedOrder.ID() != order.ID() {
 		t.Fail()
 	}
 }

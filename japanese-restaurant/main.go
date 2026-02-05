@@ -1,9 +1,28 @@
 package main
 
-// create restaurant
+import (
+	"context"
 
-// create multiple customers
+	"github.com/tulara/japanese-restaurant/japanese-restaurant/customer"
+	"github.com/tulara/japanese-restaurant/japanese-restaurant/queue"
+	"github.com/tulara/japanese-restaurant/japanese-restaurant/restaurant"
+)
 
-// customers make a few orders. restaurant accepts orders idempontently updates inventory.
+// should only work because buffer is same as orders placed
+func main() {
+	q := queue.NewChannelQueue()
+	restaurant := restaurant.New(q)
 
-// on exit, print inventory.
+	customerElinor := customer.New(q)
+	customerEdward := customer.New(q)
+
+	// customers can only place one order for now.
+	// TODO: this concurrently
+	customerElinor.PlaceOrder(queue.NewOrder(map[int]int{1: 1}))
+	restaurant.ProcessOrder(context.Background())
+
+	customerEdward.PlaceOrder(queue.NewOrder(map[int]int{6: 1}))
+	restaurant.ProcessOrder(context.Background())
+
+	restaurant.ListInventory()
+}
