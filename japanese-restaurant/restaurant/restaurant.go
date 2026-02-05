@@ -34,16 +34,16 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 		return err
 	}
 
-	id := order.ID()
-
 	r.inventoryMtx.Lock()
 	defer r.inventoryMtx.Unlock()
+	for mealID, amountOrdered := range order.Meals {
+		id := mealID
+		currentStock := r.inventory[id]
+		r.inventory[id] = currentStock - amountOrdered
 
-	currentStock := r.inventory[id]
-	r.inventory[id] = currentStock - 1
-
-	mealName := Menu[id]
-	fmt.Printf("Order for %s recieved.\n", mealName)
+		mealName := Menu[id]
+		fmt.Printf("Order for %s recieved.\n", mealName)
+	}
 
 	return nil
 }

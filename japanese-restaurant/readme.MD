@@ -9,3 +9,8 @@ Requirements:
 * Implement circuit breaker pattern for external calls
 * Include retry logic with exponential backoff
 Key Concepts: Event-driven architecture, message queues, concurrency patterns, error handling, at-least-once delivery
+
+
+## TODO
+[ ] handle case where amount ordered exceeds inventory stock.
+[ ] list inventory is nondeterministic
