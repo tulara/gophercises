@@ -1,6 +1,9 @@
 package queue
 
-import "context"
+import (
+	"context"
+	"errors"
+)
 
 // https://gobyexample.com/select
 
@@ -24,11 +27,18 @@ func (q *channelQueue) SendOrder(ctx context.Context, order Order) bool {
 	}
 }
 
-func (q *channelQueue) RecieveOrder(ctx context.Context) (Order, error) {
+func (q *channelQueue) ReceiveOrder(ctx context.Context) (Order, error) {
 	select {
-	case order := <-q.orderChan:
+	case order, ok := <-q.orderChan:
+		if !ok {
+			return Order{}, errors.New("queue closed")
+		}
 		return order, nil
 	case <-ctx.Done():
 		return Order{}, ctx.Err()
 	}
+}
+
+func (q *channelQueue) Close() {
+	close(q.orderChan)
 }

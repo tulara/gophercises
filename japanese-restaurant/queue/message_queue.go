@@ -4,5 +4,6 @@ import "context"
 
 type Queue interface {
 	SendOrder(ctx context.Context, order Order) bool
-	RecieveOrder(ctx context.Context) (Order, error)
+	ReceiveOrder(ctx context.Context) (Order, error)
+	Close()
 }
