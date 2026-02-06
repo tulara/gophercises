@@ -3,6 +3,6 @@ package queue
 import "context"
 
 type Queue interface {
-	SendOrder(order Order) bool
+	SendOrder(ctx context.Context, order Order) bool
 	RecieveOrder(ctx context.Context) (Order, error)
 }

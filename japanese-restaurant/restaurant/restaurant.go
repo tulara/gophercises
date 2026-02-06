@@ -28,11 +28,25 @@ func New(q queue.Queue) Restaurant {
 	}
 }
 
+func (r *Restaurant) Open(ctx context.Context) {
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				r.ProcessOrder(ctx)
+			}
+		}
+	}()
+}
+
 func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 	order, err := r.q.RecieveOrder(ctx)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Order %d is being prepared\n", order.ID())
 
 	r.inventoryMtx.Lock()
 	defer r.inventoryMtx.Unlock()
@@ -42,7 +56,7 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 		r.inventory[id] = currentStock - amountOrdered
 
 		mealName := Menu[id]
-		fmt.Printf("Order for %s recieved.\n", mealName)
+		fmt.Printf("Order up for %s.\n", mealName)
 	}
 
 	return nil

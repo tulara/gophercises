@@ -15,12 +15,11 @@ func NewChannelQueue() Queue {
 	}
 }
 
-func (q *channelQueue) SendOrder(order Order) bool {
+func (q *channelQueue) SendOrder(ctx context.Context, order Order) bool {
 	select {
 	case q.orderChan <- order:
 		return true
-	default:
-		// log buffer overflow?
+	case <-ctx.Done():
 		return false
 	}
 }

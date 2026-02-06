@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"context"
 	"log/slog"
 
 	"github.com/tulara/japanese-restaurant/japanese-restaurant/queue"
@@ -16,9 +17,9 @@ func New(q queue.Queue) Customer {
 	}
 }
 
-func (c *Customer) PlaceOrder(order queue.Order) {
-	sent := c.q.SendOrder(order)
+func (c *Customer) PlaceOrder(ctx context.Context, order queue.Order) {
+	sent := c.q.SendOrder(ctx, order)
 	if !sent {
-		slog.Error("Failed to place order")
+		slog.Error("Failed to place order:", "order_id", order.ID())
 	}
 }
