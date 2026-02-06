@@ -53,9 +53,16 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 	for mealID, amountOrdered := range order.Meals {
 		id := mealID
 		currentStock := r.inventory[id]
-		r.inventory[id] = currentStock - amountOrdered
 
 		mealName := Menu[id]
+		if amountOrdered > currentStock {
+			r.inventory[id] = 0
+			numberMissing := amountOrdered - currentStock
+			fmt.Printf("Apologies, %d %s will be missing from your order\n", numberMissing, mealName)
+		} else {
+			r.inventory[id] = currentStock - amountOrdered
+		}
+
 		fmt.Printf("Order up for %s.\n", mealName)
 	}
 
@@ -63,7 +70,7 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 }
 
 func (r *Restaurant) ListInventory() {
-	fmt.Println("We have...")
+	fmt.Println("\nThe restaurant now has...")
 
 	r.inventoryMtx.RLock()
 	defer r.inventoryMtx.RUnlock()

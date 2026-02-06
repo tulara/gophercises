@@ -20,11 +20,9 @@ func main() {
 	restaurant.Open(ctx)
 
 	// customers can only place one order for now.
-	// TODO: this concurrently
-	// TODO: customers place orders in English
 	customerElinor.PlaceOrder(ctx, queue.NewOrder(map[int]int{1: 1}))
 	customerEdward.PlaceOrder(ctx, queue.NewOrder(map[int]int{6: 1}))
-	customerMarianne.PlaceOrder(ctx, queue.NewOrder(map[int]int{2: 1, 5: 1}))
+	customerMarianne.PlaceOrder(ctx, queue.NewOrder(map[int]int{2: 6, 5: 1}))
 
 	time.Sleep(2 * time.Second)
 	cancel()

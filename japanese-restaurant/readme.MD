@@ -12,5 +12,5 @@ Key Concepts: Event-driven architecture, message queues, concurrency patterns, e
 
 
 ## TODO
-[ ] handle case where amount ordered exceeds inventory stock.
+[ ] customers place orders in English
 [ ] list inventory is nondeterministic

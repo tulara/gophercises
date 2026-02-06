@@ -13,7 +13,7 @@ func TestSendAndRecieve(t *testing.T) {
 		},
 	}
 
-	q.SendOrder(order)
+	q.SendOrder(context.Background(), order)
 	recievedOrder, err := q.RecieveOrder(context.Background())
 
 	if err != nil {
