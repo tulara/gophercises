@@ -18,12 +18,12 @@ func NewChannelQueue() Queue {
 	}
 }
 
-func (q *channelQueue) SendOrder(ctx context.Context, order Order) bool {
+func (q *channelQueue) SendOrder(ctx context.Context, order Order) error {
 	select {
 	case q.orderChan <- order:
-		return true
+		return nil
 	case <-ctx.Done():
-		return false
+		return nil
 	}
 }
 

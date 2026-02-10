@@ -47,7 +47,7 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Order %d is being prepared\n", order.ID())
+	fmt.Printf("Order %d is being prepared\n", order.ID)
 
 	r.inventoryMtx.Lock()
 	defer r.inventoryMtx.Unlock()

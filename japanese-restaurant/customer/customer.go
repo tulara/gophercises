@@ -18,8 +18,8 @@ func New(q queue.Queue) Customer {
 }
 
 func (c *Customer) PlaceOrder(ctx context.Context, order queue.Order) {
-	sent := c.q.SendOrder(ctx, order)
-	if !sent {
-		slog.Error("Failed to place order:", "order_id", order.ID())
+	err := c.q.SendOrder(ctx, order)
+	if err != nil {
+		slog.Error("Failed to place order:", "order_id", order.ID, "error", err)
 	}
 }

@@ -20,7 +20,7 @@ func TestSendAndRecieve(t *testing.T) {
 		t.Fatalf("Error where none expected: %v", err)
 	}
 
-	if recievedOrder.ID() != order.ID() {
+	if recievedOrder.ID != order.ID {
 		t.Fail()
 	}
 }

@@ -12,5 +12,15 @@ Key Concepts: Event-driven architecture, message queues, concurrency patterns, e
 
 
 ## TODO
+[ ] refresh queue/messaging concepts
+ - consumer groups for multiple "kitchen workers"
 [ ] customers place orders in English
 [ ] list inventory is nondeterministic
+
+
+## To Run
+
+Start redis container
+```
+docker run -d --name redis -p 6379:6379 redis:latest
+```
