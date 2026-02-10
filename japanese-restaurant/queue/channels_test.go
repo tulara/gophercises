@@ -14,7 +14,7 @@ func TestSendAndRecieve(t *testing.T) {
 	}
 
 	q.SendOrder(context.Background(), order)
-	recievedOrder, err := q.RecieveOrder(context.Background())
+	recievedOrder, err := q.ReceiveOrder(context.Background())
 
 	if err != nil {
 		t.Fatalf("Error where none expected: %v", err)
