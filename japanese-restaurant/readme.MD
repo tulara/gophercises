@@ -25,3 +25,13 @@ Start redis container
 ```
 docker run -d --name redis -p 6379:6379 redis:latest
 ```
+
+Read all data
+```
+xrange orders - +
+```
+
+Reset data
+```
+DEL orders
+```

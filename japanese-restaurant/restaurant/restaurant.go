@@ -28,18 +28,13 @@ func New(q queue.Queue) Restaurant {
 	}
 }
 
-func (r *Restaurant) Open(ctx context.Context) <-chan struct{} {
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		for {
-			if err := r.ProcessOrder(ctx); err != nil {
-				fmt.Printf("ERROR: %v", err) // Not always technically and error, some flows are expected
-				return
-			}
+func (r *Restaurant) Open(ctx context.Context) {
+	for {
+		if err := r.ProcessOrder(ctx); err != nil {
+			fmt.Printf("ERROR: %v", err) // Not always technically an error, some flows are expected
+			return
 		}
-	}()
-	return done
+	}
 }
 
 func (r *Restaurant) ProcessOrder(ctx context.Context) error {
