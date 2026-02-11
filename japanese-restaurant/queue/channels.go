@@ -42,3 +42,7 @@ func (q *channelQueue) ReceiveOrder(ctx context.Context) (Order, error) {
 func (q *channelQueue) Close() {
 	close(q.orderChan)
 }
+
+func (q *channelQueue) Drain(ctx context.Context) ([]Order, error) {
+	panic("unimplemented")
+}

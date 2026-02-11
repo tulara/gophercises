@@ -14,11 +14,12 @@ func main() {
 	restaurant := restaurant.New(q)
 
 	ctx := context.Background()
+	done := make(chan struct{})
 
 	var wg sync.WaitGroup
 
 	wg.Go(func() {
-		restaurant.Open(ctx)
+		restaurant.Open(ctx, done)
 	})
 
 	wg.Go(func() {
@@ -26,6 +27,7 @@ func main() {
 	})
 
 	wg.Wait()
+	close(done)
 	q.Close()
 
 	restaurant.ListInventory()

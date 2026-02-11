@@ -14,8 +14,8 @@ type Restaurant struct {
 	inventory    map[int]int // product id and number stored
 }
 
-func New(q queue.Queue) Restaurant {
-	return Restaurant{
+func New(q queue.Queue) *Restaurant {
+	return &Restaurant{
 		q: q,
 		inventory: map[int]int{
 			1: 5,
@@ -28,8 +28,21 @@ func New(q queue.Queue) Restaurant {
 	}
 }
 
-func (r *Restaurant) Open(ctx context.Context) {
-	for {
+func (r *Restaurant) Open(ctx context.Context, done <-chan struct{}) {
+	// if orders have finished sending, make sure they are processed before closing
+	// otherwise keep listening for an order
+
+	select {
+	case <-done:
+		orders, err := r.q.Drain(ctx)
+		if err != nil {
+			fmt.Printf("ERROR: %v", err)
+		}
+		for _, o := range orders {
+			r.processOrder(ctx, o)
+		}
+		return // queue empty.
+	default:
 		if err := r.ProcessOrder(ctx); err != nil {
 			fmt.Printf("ERROR: %v", err) // Not always technically an error, some flows are expected
 			return
@@ -44,6 +57,12 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 	}
 	fmt.Printf("Order %d is being prepared\n", order.ID)
 
+	r.processOrder(ctx, order)
+	return nil
+
+}
+
+func (r *Restaurant) processOrder(ctx context.Context, order queue.Order) {
 	r.inventoryMtx.Lock()
 	defer r.inventoryMtx.Unlock()
 	for mealID, amountOrdered := range order.Meals {
@@ -61,8 +80,6 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 
 		fmt.Printf("Order up for %s.\n", mealName)
 	}
-
-	return nil
 }
 
 func (r *Restaurant) ListInventory() {

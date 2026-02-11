@@ -6,4 +6,5 @@ type Queue interface {
 	SendOrder(ctx context.Context, order Order) error
 	ReceiveOrder(ctx context.Context) (Order, error)
 	Close()
+	Drain(ctx context.Context) ([]Order, error)
 }

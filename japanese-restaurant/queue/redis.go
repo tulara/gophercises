@@ -48,6 +48,26 @@ func (r *RedisQueue) ReceiveOrder(ctx context.Context) (Order, error) {
 	return order, err
 }
 
+func (r *RedisQueue) Drain(ctx context.Context) ([]Order, error) {
+	results, err := r.rdb.XRead(ctx, &redis.XReadArgs{
+		Streams: []string{stream, r.lastID},
+		Block:   0, // don't block
+		Count:   0, // all available
+	}).Result()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var orders []Order
+	for _, msg := range results[0].Messages {
+		var order Order
+		order.UnmarshalBinary([]byte(msg.Values["order"].(string)))
+		orders = append(orders, order)
+	}
+	return orders, nil
+}
+
 func (r *RedisQueue) SendOrder(ctx context.Context, order Order) error {
 	// what happens on retry?
 	_, err := r.rdb.XAdd(ctx, &redis.XAddArgs{

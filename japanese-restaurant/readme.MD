@@ -12,7 +12,6 @@ Key Concepts: Event-driven architecture, message queues, concurrency patterns, e
 
 
 ## TODO
-[ ] race condition between placing last order and closing redis connection
 [ ] refresh queue/messaging concepts
  - consumer groups for multiple "kitchen workers"
 [ ] customers place orders in English
