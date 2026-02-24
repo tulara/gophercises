@@ -10,7 +10,8 @@ Included in the folder example-data are three sample data files defining surveys
     survey-3.csv
 
 Each row represents a question in that survey with headers defining what question data is in each column.
-Response Data
+
+##Response Data
 
 And three sample files containing responses to the corresponding survey:
 
@@ -36,11 +37,11 @@ The output should include:
 
     The participation percentage and total participant counts of the survey.
 
-    Any response with a 'submitted_at' date has submitted and is said to have participated in the survey.
+    -> Any response with a 'submitted_at' date has submitted and is said to have participated in the survey.
 
     The average for each rating question
 
-    Results from unsubmitted surveys should not be considered in the output.
+    -> Results from unsubmitted surveys should not be considered in the output.
 
 #Other information
 
