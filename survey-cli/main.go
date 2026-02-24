@@ -1,5 +1,13 @@
 package main
 
+import (
+	"log"
+	"os"
+
+	"github.com/tulararogers-webster/gophercises/survey-cli/parser"
+	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
+)
+
 // input:
 // first argument is name of csv file, second argument is responses.
 // number of questions tells us how many columns to expect in responses.
@@ -17,3 +25,26 @@ package main
 
 // main will include reading from files.
 // pachage delegation for validation and aggregation
+
+func main() {
+	if len(os.Args) < 2 {
+		log.Fatal("usage: survey-cli <responses.csv>")
+	}
+
+	//questionsFile := os.Args[1]
+	responsesFile := os.Args[1]
+
+	f, err := os.Open(responsesFile)
+	if err != nil {
+		log.Fatalf("Error opening %s:%v", responsesFile, err)
+	}
+	defer f.Close()
+
+	responses, err := parser.ParseResponses(f)
+	if err != nil {
+		log.Fatalf("Error parsing responses: %v", err)
+	}
+
+	count := summary.CountTotalParticipants(responses)
+	log.Printf("Total participants: %d", count)
+}
