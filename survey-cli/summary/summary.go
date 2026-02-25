@@ -1,11 +1,12 @@
 package summary
 
 type SurveyResponse struct {
-	Email       string
+	Email string
+	// EmployeeId is parsed to 0 when empty.
 	EmployeeId  int
 	SubmittedAt string
 
-	// 0 indicates unanswered
+	// Responses are parsed to 0 when unanswered
 	Responses []int
 }
 

@@ -52,9 +52,14 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 		return summary.SurveyResponse{}, errors.New("row must have employee id or email")
 
 	}
-	employeeID, err := strconv.Atoi(id)
-	if err != nil {
-		return summary.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", row[1], err)
+
+	employeeID := 0
+	var err error
+	if id != "" {
+		employeeID, err = strconv.Atoi(id)
+		if err != nil {
+			return summary.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", row[1], err)
+		}
 	}
 
 	var parsedResponses []int
