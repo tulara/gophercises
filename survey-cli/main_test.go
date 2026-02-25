@@ -17,4 +17,5 @@ func TestCLI_HappyPath(t *testing.T) {
 
 	require.NoError(t, err, "program exited with error:\n%s", string(out))
 	assert.Contains(t, string(out), "Total participants: 5")
+	assert.Contains(t, string(out), "Participation percentage: 83.33%")
 }

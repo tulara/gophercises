@@ -46,5 +46,7 @@ func main() {
 	}
 
 	count := summary.CountTotalParticipants(responses)
+	pct := summary.ParticipationPercentage(responses)
 	log.Printf("Total participants: %d", count)
+	log.Printf("Participation percentage: %.2f%%", pct)
 }

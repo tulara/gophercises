@@ -1,4 +1,0 @@
-// SurveyResponses should contain only unique entries.
-// user is identical ir either email or employee id are the same.
-// if user has timestamp, disregard any ubsmitted entries. Otherwise count only one for participation percentage
-
