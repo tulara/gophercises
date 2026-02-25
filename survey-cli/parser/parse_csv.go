@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/mail"
 	"strconv"
+	"time"
 
 	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
 )
@@ -34,9 +36,64 @@ func ParseResponses(r io.Reader) ([]summary.SurveyResponse, error) {
 		responses = append(responses, resp)
 	}
 
-	return responses, nil
+	return deduplicate(responses), nil
 }
 
+func deduplicate(responses []summary.SurveyResponse) []summary.SurveyResponse {
+	byEmail := map[string]int{}
+	byID := map[int]int{}
+	var result []summary.SurveyResponse
+
+	for _, r := range responses {
+		existingIdx := -1
+		if r.Email != "" {
+			if idx, ok := byEmail[r.Email]; ok {
+				existingIdx = idx
+			}
+		}
+		if existingIdx == -1 && r.EmployeeId != 0 {
+			if idx, ok := byID[r.EmployeeId]; ok {
+				existingIdx = idx
+			}
+		}
+
+		if existingIdx == -1 {
+			idx := len(result)
+			result = append(result, r)
+			if r.Email != "" {
+				byEmail[r.Email] = idx
+			}
+			if r.EmployeeId != 0 {
+				byID[r.EmployeeId] = idx
+			}
+		} else {
+			result[existingIdx] = wasSubmittedLater(result[existingIdx], r)
+		}
+	}
+
+	return result
+}
+
+func wasSubmittedLater(existing, incoming summary.SurveyResponse) summary.SurveyResponse {
+	if existing.SubmittedAt != "" {
+		// discard unsubmitted surveys if there is a submitted one.
+		if incoming.SubmittedAt == "" {
+			return existing
+		}
+
+		// we know times will be valid because invalid times will have been discarded during parsing.
+		et, _ := time.Parse(time.RFC3339, existing.SubmittedAt)
+		it, _ := time.Parse(time.RFC3339, incoming.SubmittedAt)
+
+		if et.After(it) {
+			return existing
+		}
+	}
+	return incoming
+}
+
+// Ensures all parsed survey rows are valid
+// Errors abort parsing completely. A more graceful solution would be to skip the row and continue with the rest of the report.
 func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 	if len(row) < 4 {
 		return summary.SurveyResponse{}, fmt.Errorf("expected at least 4 columns, but got %d", len(row))
@@ -58,7 +115,21 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 	if id != "" {
 		employeeID, err = strconv.Atoi(id)
 		if err != nil {
-			return summary.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", row[1], err)
+			return summary.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", id, err)
+		}
+	}
+
+	if email != "" {
+		_, err := mail.ParseAddress(email)
+		if err != nil {
+			return summary.SurveyResponse{}, fmt.Errorf("invalid email %q: %w", email, err)
+		}
+	}
+
+	if submittedAt != "" {
+		_, err := time.Parse(time.RFC3339, submittedAt)
+		if err != nil {
+			return summary.SurveyResponse{}, fmt.Errorf("invalid submittedAt timestamp %q: %w", submittedAt, err)
 		}
 	}
 
@@ -77,7 +148,6 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 		parsedResponses = append(parsedResponses, val)
 	}
 
-	// could add extra validation for valid email and timestamp.
 	return summary.SurveyResponse{
 		Email:       email,
 		EmployeeId:  employeeID,
