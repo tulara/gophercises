@@ -1,7 +1,7 @@
 Your task is to build a CLI application to parse and display survey data from CSV files, and display the results.
 
-#Data Format
-##Survey Data
+#Data Format 
+##Survey Data  
 
 Included in the folder example-data are three sample data files defining surveys:
 
@@ -11,7 +11,7 @@ Included in the folder example-data are three sample data files defining surveys
 
 Each row represents a question in that survey with headers defining what question data is in each column.
 
-##Response Data
+##Response Data  
 
 And three sample files containing responses to the corresponding survey:
 
@@ -29,7 +29,7 @@ Response columns are always in the following order:
     Blank answers represent not answered.
     Answers to Single Select Questions can be any string.
 
-#The Application
+#The Application  
 
 Your coding challenge is to build an application that allows the user to specify a survey file and a file for it's results. It should read them in and present a summary of the survey results. A command line application that takes a data file as input is sufficient.
 
@@ -43,7 +43,7 @@ The output should include:
 
     -> Results from unsubmitted surveys should not be considered in the output.
 
-#Other information
+#Other information  
 
 Please include a Readme with any additional information you would like to include. You may wish to use it to explain any design decisions.
 
