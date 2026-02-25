@@ -1,13 +1,14 @@
-package summary
+package summary_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
 )
 
 func Test_ShouldCalculateTotalParticipantCount(t *testing.T) {
-	surveyResponses := []SurveyResponse{
+	surveyResponses := []summary.SurveyResponse{
 		{
 			Email:       "employee1@abc.xyz",
 			EmployeeId:  1,
@@ -22,12 +23,12 @@ func Test_ShouldCalculateTotalParticipantCount(t *testing.T) {
 		},
 	}
 
-	count := CountTotalParticipants(surveyResponses)
+	count := summary.CountTotalParticipants(surveyResponses)
 	assert.Equal(t, 2, count, "total count did not match expected")
 }
 
 func Test_ShouldHandleUnsubmittedSurveys(t *testing.T) {
-	surveyResponses := []SurveyResponse{
+	surveyResponses := []summary.SurveyResponse{
 		{
 			Email:       "employee1@abc.xyz",
 			EmployeeId:  1,
@@ -48,7 +49,7 @@ func Test_ShouldHandleUnsubmittedSurveys(t *testing.T) {
 		},
 	}
 
-	count := CountTotalParticipants(surveyResponses)
+	count := summary.CountTotalParticipants(surveyResponses)
 	assert.Equal(t, 2, count, "total count did not match expected")
 
 }

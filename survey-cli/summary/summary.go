@@ -4,7 +4,9 @@ type SurveyResponse struct {
 	Email       string
 	EmployeeId  int
 	SubmittedAt string
-	Responses   []int
+
+	// 0 indicates unanswered
+	Responses []int
 }
 
 // will need to model different types of responses
@@ -12,8 +14,6 @@ type SurveyResponse struct {
 // 	Type  string
 // 	Value int
 // }
-
-//
 
 func CountTotalParticipants(responses []SurveyResponse) int {
 	// make sure unique, here or before here
