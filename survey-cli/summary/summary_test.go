@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tulararogers-webster/gophercises/survey-cli/domain"
 	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
 )
 
 func Test_ShouldCalculateTotalParticipantCount(t *testing.T) {
-	surveyResponses := []summary.SurveyResponse{
+	surveyResponses := []domain.SurveyResponse{
 		{
 			Email:       "employee1@abc.xyz",
 			EmployeeId:  1,
@@ -28,7 +29,7 @@ func Test_ShouldCalculateTotalParticipantCount(t *testing.T) {
 }
 
 func Test_ShouldHandleUnsubmittedSurveys(t *testing.T) {
-	surveyResponses := []summary.SurveyResponse{
+	surveyResponses := []domain.SurveyResponse{
 		{
 			Email:       "employee1@abc.xyz",
 			EmployeeId:  1,
@@ -54,7 +55,7 @@ func Test_ShouldHandleUnsubmittedSurveys(t *testing.T) {
 }
 
 func TestParticipationPercentage_AllParticipated(t *testing.T) {
-	responses := []summary.SurveyResponse{
+	responses := []domain.SurveyResponse{
 		{EmployeeId: 1, SubmittedAt: "2014-07-28T20:35:41+00:00"},
 		{EmployeeId: 2, SubmittedAt: "2014-07-29T07:05:41+00:00"},
 	}
@@ -65,7 +66,7 @@ func TestParticipationPercentage_AllParticipated(t *testing.T) {
 }
 
 func TestParticipationPercentage_NoneParticipated(t *testing.T) {
-	responses := []summary.SurveyResponse{
+	responses := []domain.SurveyResponse{
 		{EmployeeId: 1, SubmittedAt: ""},
 		{EmployeeId: 2, SubmittedAt: ""},
 		{EmployeeId: 3, SubmittedAt: ""},
@@ -77,7 +78,7 @@ func TestParticipationPercentage_NoneParticipated(t *testing.T) {
 }
 
 func TestParticipationPercentage_PartialParticipation(t *testing.T) {
-	responses := []summary.SurveyResponse{
+	responses := []domain.SurveyResponse{
 		{EmployeeId: 1, SubmittedAt: "2014-07-28T20:35:41+00:00"},
 		{EmployeeId: 2, SubmittedAt: "2014-07-29T07:05:41+00:00"},
 		{EmployeeId: 3, SubmittedAt: ""},
@@ -90,7 +91,7 @@ func TestParticipationPercentage_PartialParticipation(t *testing.T) {
 }
 
 func TestParticipationPercentage_FractionalResult(t *testing.T) {
-	responses := []summary.SurveyResponse{
+	responses := []domain.SurveyResponse{
 		{EmployeeId: 1, SubmittedAt: "2014-07-28T20:35:41+00:00"},
 		{EmployeeId: 2, SubmittedAt: ""},
 		{EmployeeId: 3, SubmittedAt: ""},
@@ -101,7 +102,7 @@ func TestParticipationPercentage_FractionalResult(t *testing.T) {
 }
 
 func TestParticipationPercentage_EmptyInput(t *testing.T) {
-	pct := summary.ParticipationPercentage([]summary.SurveyResponse{})
+	pct := summary.ParticipationPercentage([]domain.SurveyResponse{})
 
 	// no division by zero — zero total means zero participation
 	assert.Equal(t, 0.0, pct)

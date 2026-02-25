@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tulararogers-webster/gophercises/survey-cli/domain"
 	"github.com/tulararogers-webster/gophercises/survey-cli/parser"
-	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
 )
 
 func TestParseResponses_ValidInput(t *testing.T) {
@@ -20,13 +20,13 @@ func TestParseResponses_ValidInput(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, responses, 2)
-	assert.Equal(t, summary.SurveyResponse{
+	assert.Equal(t, domain.SurveyResponse{
 		Email:       "employee1@abc.xyz",
 		EmployeeId:  1,
 		SubmittedAt: "2014-07-28T20:35:41+00:00",
 		Responses:   []int{5, 4, 3},
 	}, responses[0])
-	assert.Equal(t, summary.SurveyResponse{
+	assert.Equal(t, domain.SurveyResponse{
 		Email:       "",
 		EmployeeId:  2,
 		SubmittedAt: "2014-07-29T07:05:41+00:00",

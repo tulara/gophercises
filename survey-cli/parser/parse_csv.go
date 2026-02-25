@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tulararogers-webster/gophercises/survey-cli/summary"
+	"github.com/tulararogers-webster/gophercises/survey-cli/domain"
 )
 
-func ParseResponses(r io.Reader) ([]summary.SurveyResponse, error) {
+func ParseResponses(r io.Reader) ([]domain.SurveyResponse, error) {
 	reader := csv.NewReader(r)
 	reader.FieldsPerRecord = 0 // use the first row to determine how many fields each row should have
 
@@ -26,7 +26,7 @@ func ParseResponses(r io.Reader) ([]summary.SurveyResponse, error) {
 		return nil, errors.New("Survey response input was empty")
 	}
 
-	var responses []summary.SurveyResponse
+	var responses []domain.SurveyResponse
 	for i, row := range rows {
 		resp, err := parseSurveyResponseRow(row)
 		if err != nil {
@@ -39,10 +39,10 @@ func ParseResponses(r io.Reader) ([]summary.SurveyResponse, error) {
 	return deduplicate(responses), nil
 }
 
-func deduplicate(responses []summary.SurveyResponse) []summary.SurveyResponse {
+func deduplicate(responses []domain.SurveyResponse) []domain.SurveyResponse {
 	byEmail := map[string]int{}
 	byID := map[int]int{}
-	var result []summary.SurveyResponse
+	var result []domain.SurveyResponse
 
 	for _, r := range responses {
 		existingIdx := -1
@@ -74,7 +74,7 @@ func deduplicate(responses []summary.SurveyResponse) []summary.SurveyResponse {
 	return result
 }
 
-func wasSubmittedLater(existing, incoming summary.SurveyResponse) summary.SurveyResponse {
+func wasSubmittedLater(existing, incoming domain.SurveyResponse) domain.SurveyResponse {
 	if existing.SubmittedAt != "" {
 		// discard unsubmitted surveys if there is a submitted one.
 		if incoming.SubmittedAt == "" {
@@ -94,9 +94,9 @@ func wasSubmittedLater(existing, incoming summary.SurveyResponse) summary.Survey
 
 // Ensures all parsed survey rows are valid
 // Errors abort parsing completely. A more graceful solution would be to skip the row and continue with the rest of the report.
-func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
+func parseSurveyResponseRow(row []string) (domain.SurveyResponse, error) {
 	if len(row) < 4 {
-		return summary.SurveyResponse{}, fmt.Errorf("expected at least 4 columns, but got %d", len(row))
+		return domain.SurveyResponse{}, fmt.Errorf("expected at least 4 columns, but got %d", len(row))
 	}
 
 	email := row[0]
@@ -106,7 +106,7 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 
 	// if we don't have employeeid or email, we cant count distinct participants
 	if email == "" && id == "" {
-		return summary.SurveyResponse{}, errors.New("row must have employee id or email")
+		return domain.SurveyResponse{}, errors.New("row must have employee id or email")
 
 	}
 
@@ -115,21 +115,21 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 	if id != "" {
 		employeeID, err = strconv.Atoi(id)
 		if err != nil {
-			return summary.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", id, err)
+			return domain.SurveyResponse{}, fmt.Errorf("invalid employee_id %q: %w", id, err)
 		}
 	}
 
 	if email != "" {
 		_, err := mail.ParseAddress(email)
 		if err != nil {
-			return summary.SurveyResponse{}, fmt.Errorf("invalid email %q: %w", email, err)
+			return domain.SurveyResponse{}, fmt.Errorf("invalid email %q: %w", email, err)
 		}
 	}
 
 	if submittedAt != "" {
 		_, err := time.Parse(time.RFC3339, submittedAt)
 		if err != nil {
-			return summary.SurveyResponse{}, fmt.Errorf("invalid submittedAt timestamp %q: %w", submittedAt, err)
+			return domain.SurveyResponse{}, fmt.Errorf("invalid submittedAt timestamp %q: %w", submittedAt, err)
 		}
 	}
 
@@ -143,12 +143,12 @@ func parseSurveyResponseRow(row []string) (summary.SurveyResponse, error) {
 		val, err := strconv.Atoi(r)
 		if err != nil {
 			// again, it would more appropriate to skip this column rather than abort completely.
-			return summary.SurveyResponse{}, fmt.Errorf("[column: %d] %q was not a number. Error: %w", j+4, r, err)
+			return domain.SurveyResponse{}, fmt.Errorf("[column: %d] %q was not a number. Error: %w", j+4, r, err)
 		}
 		parsedResponses = append(parsedResponses, val)
 	}
 
-	return summary.SurveyResponse{
+	return domain.SurveyResponse{
 		Email:       email,
 		EmployeeId:  employeeID,
 		SubmittedAt: submittedAt,

@@ -1,16 +1,10 @@
 package summary
 
-import "math"
+import (
+	"math"
 
-type SurveyResponse struct {
-	Email string
-	// EmployeeId is parsed to 0 when empty.
-	EmployeeId  int
-	SubmittedAt string
-
-	// Responses are parsed to 0 when unanswered
-	Responses []int
-}
+	"github.com/tulararogers-webster/gophercises/survey-cli/domain"
+)
 
 // will need to model different types of responses
 // type Response struct {
@@ -21,7 +15,7 @@ type SurveyResponse struct {
 // ParticipationPercentage calculates the ratio of users who submitted a survey (participants)
 // to all users (including those who have unsubmitted surveys).
 // Returns percentage to two decimal places
-func ParticipationPercentage(responses []SurveyResponse) float64 {
+func ParticipationPercentage(responses []domain.SurveyResponse) float64 {
 	if len(responses) == 0 {
 		return 0.0
 	}
@@ -29,7 +23,7 @@ func ParticipationPercentage(responses []SurveyResponse) float64 {
 	return math.Round(raw*100) / 100
 }
 
-func CountTotalParticipants(responses []SurveyResponse) int {
+func CountTotalParticipants(responses []domain.SurveyResponse) int {
 	count := 0
 	for _, r := range responses {
 		if r.SubmittedAt != "" {
