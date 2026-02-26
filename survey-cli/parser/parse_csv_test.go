@@ -130,7 +130,7 @@ func TestParseResponses_DeduplicatesByEmail(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, responses, 1)
-	assert.Equal(t, "2014-07-29T07:05:41+00:00", responses[0].SubmittedAt)
+	assert.Equal(t, "2014-07-29T07:05:41Z", responses[0].SubmittedAt.Format(time.RFC3339))
 }
 
 func TestParseResponses_DeduplicatesByEmployeeID(t *testing.T) {
@@ -143,7 +143,7 @@ func TestParseResponses_DeduplicatesByEmployeeID(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, responses, 1)
-	assert.Equal(t, "2014-07-29T07:05:41+00:00", responses[0].SubmittedAt)
+	assert.Equal(t, "2014-07-29T07:05:41Z", responses[0].SubmittedAt.Format(time.RFC3339))
 }
 
 func TestParseResponses_KeepLatestSubmittedWhereThereAreDuplicateUnsubmitted(t *testing.T) {
@@ -157,7 +157,7 @@ func TestParseResponses_KeepLatestSubmittedWhereThereAreDuplicateUnsubmitted(t *
 
 	require.NoError(t, err)
 	assert.Len(t, responses, 1)
-	assert.Equal(t, "2014-07-29T20:35:41+00:00", responses[0].SubmittedAt)
+	assert.Equal(t, "2014-07-29T20:35:41Z", responses[0].SubmittedAt.Format(time.RFC3339))
 }
 
 func TestParseResponses_DeduplicatesKeepsLastIfBothUnsubmitted(t *testing.T) {
