@@ -26,7 +26,7 @@ func ParticipationPercentage(responses []domain.SurveyResponse) float64 {
 func CountTotalParticipants(responses []domain.SurveyResponse) int {
 	count := 0
 	for _, r := range responses {
-		if r.SubmittedAt != "" {
+		if !r.SubmittedAt.IsZero() {
 			count = count + 1
 		}
 	}

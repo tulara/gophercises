@@ -75,17 +75,13 @@ func deduplicate(responses []domain.SurveyResponse) []domain.SurveyResponse {
 }
 
 func wasSubmittedLater(existing, incoming domain.SurveyResponse) domain.SurveyResponse {
-	if existing.SubmittedAt != "" {
+	if !existing.SubmittedAt.IsZero() {
 		// discard unsubmitted surveys if there is a submitted one.
-		if incoming.SubmittedAt == "" {
+		if incoming.SubmittedAt.IsZero() {
 			return existing
 		}
 
-		// we know times will be valid because invalid times will have been discarded during parsing.
-		et, _ := time.Parse(time.RFC3339, existing.SubmittedAt)
-		it, _ := time.Parse(time.RFC3339, incoming.SubmittedAt)
-
-		if et.After(it) {
+		if existing.SubmittedAt.After(incoming.SubmittedAt) {
 			return existing
 		}
 	}
@@ -126,11 +122,14 @@ func parseSurveyResponseRow(row []string) (domain.SurveyResponse, error) {
 		}
 	}
 
+	var submittedAtTime time.Time
 	if submittedAt != "" {
-		_, err := time.Parse(time.RFC3339, submittedAt)
+		submittedAtTime, err = time.Parse(time.RFC3339, submittedAt)
 		if err != nil {
 			return domain.SurveyResponse{}, fmt.Errorf("invalid submittedAt timestamp %q: %w", submittedAt, err)
 		}
+	} else {
+		submittedAtTime = time.Time{}
 	}
 
 	var parsedResponses []int
@@ -151,7 +150,7 @@ func parseSurveyResponseRow(row []string) (domain.SurveyResponse, error) {
 	return domain.SurveyResponse{
 		Email:       email,
 		EmployeeId:  employeeID,
-		SubmittedAt: submittedAt,
+		SubmittedAt: submittedAtTime,
 		Responses:   parsedResponses,
 	}, nil
 }
