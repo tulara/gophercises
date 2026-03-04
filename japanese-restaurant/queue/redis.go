@@ -36,6 +36,11 @@ func (r *RedisQueue) ReceiveOrder(ctx context.Context) (Order, error) {
 		Count:   1,
 	}).Result()
 
+	if err != nil && err == redis.Nil {
+		// no new messages found
+		return Order{}, nil
+	}
+
 	if err != nil {
 		return Order{}, err
 	}
@@ -73,9 +78,14 @@ func (r *RedisQueue) Drain(ctx context.Context) ([]Order, error) {
 
 func (r *RedisQueue) SendOrder(ctx context.Context, order Order) error {
 	// what happens on retry?
-	_, err := r.rdb.XAdd(ctx, &redis.XAddArgs{
+	data, err := order.MarshalBinary()
+	if err != nil {
+		return fmt.Errorf("Failed to marshal order: %w", err)
+	}
+
+	_, err = r.rdb.XAdd(ctx, &redis.XAddArgs{
 		Stream: "orders",
-		Values: map[string]interface{}{"order": &order},
+		Values: map[string]interface{}{"order": string(data)},
 	}).Result()
 
 	fmt.Printf("Sent order:%d \n", order.ID)
