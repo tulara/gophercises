@@ -36,15 +36,15 @@ func (r *Restaurant) Open(ctx context.Context, done <-chan struct{}) {
 	case <-done:
 		orders, err := r.q.Drain(ctx)
 		if err != nil {
-			fmt.Printf("ERROR: %v", err)
+			fmt.Printf("Error draining restaurant: %v", err)
 		}
 		for _, o := range orders {
-			r.processOrder(ctx, o)
+			r.updateInventory(ctx, o)
 		}
 		return // queue empty.
 	default:
 		if err := r.ProcessOrder(ctx); err != nil {
-			fmt.Printf("ERROR: %v", err) // Not always technically an error, some flows are expected
+			fmt.Printf("Error processing order: %v", err) // Not always technically an error, some flows are expected
 			return
 		}
 	}
@@ -57,12 +57,12 @@ func (r *Restaurant) ProcessOrder(ctx context.Context) error {
 	}
 	fmt.Printf("Order %d is being prepared\n", order.ID)
 
-	r.processOrder(ctx, order)
+	r.updateInventory(ctx, order)
 	return nil
 
 }
 
-func (r *Restaurant) processOrder(ctx context.Context, order queue.Order) {
+func (r *Restaurant) updateInventory(ctx context.Context, order queue.Order) {
 	r.inventoryMtx.Lock()
 	defer r.inventoryMtx.Unlock()
 	for mealID, amountOrdered := range order.Meals {

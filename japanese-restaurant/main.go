@@ -19,7 +19,9 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Go(func() {
-		restaurant.Open(ctx, done)
+		for {
+			restaurant.Open(ctx, done)
+		}
 	})
 
 	wg.Go(func() {

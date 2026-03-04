@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -49,11 +50,13 @@ func (r *RedisQueue) ReceiveOrder(ctx context.Context) (Order, error) {
 }
 
 func (r *RedisQueue) Drain(ctx context.Context) ([]Order, error) {
+	fmt.Println("Draining queue")
 	results, err := r.rdb.XRead(ctx, &redis.XReadArgs{
 		Streams: []string{stream, r.lastID},
 		Block:   0, // don't block
 		Count:   0, // all available
 	}).Result()
+	fmt.Printf("Found %d orders in queue", len(results[0].Messages))
 
 	if err != nil {
 		return nil, err
@@ -74,6 +77,8 @@ func (r *RedisQueue) SendOrder(ctx context.Context, order Order) error {
 		Stream: "orders",
 		Values: map[string]interface{}{"order": &order},
 	}).Result()
+
+	fmt.Printf("Sent order:%d \n", order.ID)
 
 	if err != nil {
 		return err

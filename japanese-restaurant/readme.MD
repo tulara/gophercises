@@ -27,6 +27,7 @@ docker run -d --name redis -p 6379:6379 redis:latest
 
 Read all data
 ```
+docker exec -it <container_name> redis-cli
 xrange orders - +
 ```
 
